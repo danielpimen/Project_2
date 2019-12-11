@@ -29,9 +29,6 @@ def index():
     """Return the homepage."""
     return render_template('index.html')
 
-@app.route('/images')
-def image():
-	return send_file('images/cheers.jpg')
 
 @app.route('/chartdata')
 def chart_data():
