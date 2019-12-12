@@ -9,19 +9,26 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 
 from flask import Flask, jsonify, render_template, send_file
-app = Flask(__name__)
-
 dbfile = os.path.join('db', 'state_data.db')
-engine = create_engine("sqlite:///db/state_data.db")
+engine = create_engine("sqlite:///data/state_data.db")
 
+# reflect an existing database into a new model
 Base = automap_base()
+# reflect the tables
 Base.prepare(engine, reflect=True)
 
+# Save references to each table
 
 print(Base.classes.keys())
 
 state_data = Base.classes.state_final_data
+# Create our session (link) from Python to the DB
 session = Session(engine)
+
+
+
+app = Flask(__name__)
+
 
 
 @app.route("/")
@@ -29,6 +36,17 @@ def index():
     """Return the homepage."""
     return render_template('index.html')
 
+@app.route("/routes")
+def welcome():
+    return (
+        f"Available Routes:<br/>"
+        f"/api/v1.0/precipitation<br/>"
+        f"/api/v1.0/stations<br/>"
+        f"/api/v1.0/tobs<br/>"
+        f"/api/v1.0/<start><br/>"
+        f"/api/v1.0/<end><br/>"
+
+    )
 
 @app.route('/chartdata')
 def chart_data():
@@ -64,7 +82,11 @@ def chart_data():
 		  }
 		output.append(data)
 
+	# Return a list of the column names (sample names)
 	return jsonify(output)
+
+
+
 
 if __name__ == "__main__":
     env_port = int(os.environ.get('PORT', 5000))
